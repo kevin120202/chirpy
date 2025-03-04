@@ -60,14 +60,20 @@ func main() {
 	mux.HandleFunc("POST /admin/reset", apiConfig.reset)
 
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
+
 	mux.HandleFunc("POST /api/chirps", apiConfig.handlerChirpsCreate)
 	mux.HandleFunc("GET /api/chirps", apiConfig.handlerChirpsGet)
 	mux.HandleFunc("GET /api/chirps/{chirpID}", apiConfig.handlerChirpsGetOne)
+	mux.HandleFunc("DELETE /api/chirps/{chirpID}", apiConfig.handlerChirpsDelete)
+
+	mux.HandleFunc("POST /api/polka/webhooks", apiConfig.handlerWebhook)
+
 	mux.HandleFunc("POST /api/users", apiConfig.handlerUsersCreate)
+	mux.HandleFunc("PUT /api/users", apiConfig.handlerUsersUpdate)
+
 	mux.HandleFunc("POST /api/login", apiConfig.handlerUsersLogin)
 	mux.HandleFunc("POST /api/refresh", apiConfig.handlerRefresh)
 	mux.HandleFunc("POST /api/revoke", apiConfig.handlerRevoke)
-	mux.HandleFunc("PUT /api/users", apiConfig.handlerUsersUpdate)
 
 	server := &http.Server{
 		Addr: ":" + port,

@@ -16,6 +16,7 @@ type User struct {
 	UpdatedAt 	time.Time `json:"updated_at"`
 	Email     	string    `json:"email"`
 	Password  	string	  `json:"-"`
+	IsChirpyRed bool	  `json:"is_chirpy_red"`
 }
 
 func (cfg *apiConfig) handlerUsersCreate(w http.ResponseWriter, r *http.Request) {
@@ -61,5 +62,6 @@ func (cfg *apiConfig) handlerUsersCreate(w http.ResponseWriter, r *http.Request)
 		CreatedAt: dbUser.CreatedAt,
 		UpdatedAt: dbUser.UpdatedAt,
 		Email: dbUser.Email,
+		IsChirpyRed: dbUser.IsChirpyRed,
 	}})
 }
