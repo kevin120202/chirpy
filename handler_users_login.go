@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -32,11 +33,12 @@ func (cfg *apiConfig) handlerUsersLogin(w http.ResponseWriter, r *http.Request) 
 	user, err := cfg.db.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "Incorrect email or password", err)
-	return
+		return
 	}
 
 	err = auth.CheckPasswordHash(params.Password, user.HashedPassword)
 	if err != nil {
+		fmt.Println("Password mismatch error:", err) // Debugging line
 		respondWithError(w, http.StatusUnauthorized, "Incorrect email or password", err)
 		return
 	}
