@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/google/uuid"
 )
@@ -13,8 +14,22 @@ func (cfg *apiConfig) handlerChirpsGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	authorID := uuid.Nil
+	authorIDString := r.URL.Query().Get("author_id")
+	if authorIDString != "" {
+		authorID, err = uuid.Parse(authorIDString)
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, "Invalid author ID", err)
+			return
+		}
+	}
+
 	chirps := []Chirp{}
 	for _, dbChirp := range dbChirps {
+		if authorID != uuid.Nil && dbChirp.UserID != authorID {
+			continue
+		}
+
 		chirps = append(chirps, Chirp{
 			ID:        dbChirp.ID,
 			CreatedAt: dbChirp.CreatedAt,
@@ -23,6 +38,14 @@ func (cfg *apiConfig) handlerChirpsGet(w http.ResponseWriter, r *http.Request) {
 			Body:      dbChirp.Body,
 		})
 	}
+
+	sortOrder := r.URL.Query().Get("sort")
+	sort.Slice(chirps, func(i, j int) bool {
+		if sortOrder == "desc" {
+			return chirps[i].CreatedAt.After(chirps[j].CreatedAt)
+		}
+		return chirps[i].CreatedAt.Before(chirps[j].CreatedAt)
+	})
 
 	respondWithJSON(w, http.StatusOK, chirps)
 }
